@@ -13,7 +13,7 @@ Modifie the next values as you wish
 """
 
 # Max time for a test
-timeLimit=0.1
+timeLimit=0.05
 
 # Increase rate of number of element
 precision_rate=1.1
