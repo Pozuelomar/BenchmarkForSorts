@@ -6,6 +6,7 @@ For EISTI's class
 from random import*
 from time import*
 import matplotlib.pyplot as plt
+import traceback
 
 """
 Parameters of the benchmark
@@ -13,7 +14,7 @@ Modifie the next values as you wish
 """
 
 # Max time for a test
-timeLimit=0.05
+timeLimit=0.02
 
 # Increase rate of number of element
 precision_rate=1.1
@@ -80,25 +81,28 @@ def shellSort(myList): # "An algorithm must be seen to be believed" Donald Knuth
     return(myList)
 
 def quickSort(myList): # Well, really slow if the job is allready done...
-    def quickSortAux(myList,a,b):
-        if a+1<b:
-            i=a+1
-            j=b-1
-            while i<=j:
-                while i<b and myList[i]<myList[a]:
-                    i+=1
-                while j>a and myList[j]>=myList[a]:
-                    j-=1
-                if i<j:
-                    myList[i],myList[j]=myList[j],myList[i]
-                    i+=1
-                    j-=1
-            myList[j],myList[a]=myList[a],myList[j]
+    def quickSortAux(myList):
+        while todo:
+            a,b=todo.pop()
+            if a+1<b:
+                i=a+1
+                j=b-1
+                while i<=j:
+                    while i<b and myList[i]<myList[a]:
+                        i+=1
+                    while j>a and myList[j]>=myList[a]:
+                        j-=1
+                    if i<j:
+                        myList[i],myList[j]=myList[j],myList[i]
+                        i+=1
+                        j-=1
+                myList[j],myList[a]=myList[a],myList[j]
 
 
-            quickSortAux(myList,a,j)
-            quickSortAux(myList,j+1,b)
-    quickSortAux(myList,0,len(myList))
+                todo.append((a,j))
+                todo.append((j+1,b))
+    todo=[(0,len(myList))]
+    quickSortAux(myList)
     return(myList)
 
 
@@ -130,7 +134,41 @@ def fusionSort(myList): # Well, really slow if the job is allready done...
     fusionSortAux(myList,0,len(myList))
     return(myList)
 
+def customSort(myList):
+    threshold=15
+    def insertionSortAux(myList,a,b): # This is the real one not the gnome myList
+        for i in range(a,b):
+            temp=myList[i]
+            j=i-1
+            while j>=a and myList[j]>temp:
+                myList[j+1]=myList[j]
+                j-=1
+            myList[j+1]=temp
+    def quickSortAux(myList):
+        while todo:
+            a,b=todo.pop(0)
+            if a+threshold<b:
+                i=a+1
+                j=b-1
+                while i<=j:
+                    while i<b and myList[i]<myList[a]:
+                        i+=1
+                    while j>a and myList[j]>=myList[a]:
+                        j-=1
+                    if i<j:
+                        myList[i],myList[j]=myList[j],myList[i]
+                        i+=1
+                        j-=1
+                myList[j],myList[a]=myList[a],myList[j]
 
+
+                todo.append((a,j))
+                todo.append((j+1,b))
+            else:
+                insertionSortAux(myList,a,b)
+    todo=[(0,len(myList))]
+    quickSortAux(myList)
+    return(myList)
 
 """
 Generating to-sort lists
@@ -182,7 +220,7 @@ def isSorted(l):
 Insert sorts and lists generator here
 """
 # Insert here your sort to benchmark
-sortsToTest=[bubbleSort,selectionSort,insertionSort,shellSort,quickSort,fusionSort]
+sortsToTest=[bubbleSort,selectionSort,insertionSort,shellSort,quickSort,fusionSort,customSort]
 
 # Insert here your generators of lists to sort
 listsToSort=[iShuffled,iNearSorted,iSorted,iShuffledOccurences,iReversed,fShuffled,fReversed]
@@ -227,11 +265,11 @@ for i,t in enumerate(listsToSort):
                 maxTime=max(maxTime,y[-1])
             except:
                 print(t.__name__,s.__name__,n,"Error")
+                traceback.print_exc()
                 error=True
 
             n=int(n*precision_rate)+1
-        plt.plot(x,y)
-        plt.text(x[-1], y[-1], s.__name__)
+        plt.text(x[-1], y[-1], s.__name__,color=plt.plot(x,y)[0].get_color())
     plt.axis([0.0, maxLength*1.2, 0, maxTime*1.1])
     maxLength=0
     maxTime=0

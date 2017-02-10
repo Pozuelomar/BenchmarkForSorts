@@ -129,11 +129,11 @@ for i,t in enumerate(listsToSort):
                 maxTime=max(maxTime,y[-1])
             except:
                 print(t.__name__,s.__name__,n,"Error")
+                traceback.print_exc()
                 error=True
 
             n=int(n*precision_rate)+1
-        plt.plot(x,y)
-        plt.text(x[-1], y[-1], s.__name__)
+        plt.text(x[-1], y[-1], s.__name__,color=plt.plot(x,y)[0].get_color())
     plt.axis([0.0, maxLength*1.2, 0, maxTime*1.1])
     maxLength=0
     maxTime=0
